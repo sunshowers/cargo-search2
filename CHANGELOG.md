@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 This project adheres to [Semantic Versioning](https://semver.org), where the API is the command-line interface.
 
+## [0.0.5] - 2021-10-03
+
+- Fix GitHub messasge format.
+
 ## [0.0.4] - 2021-10-03
 
 - Need to push to `main` before pushing tags.
@@ -22,6 +26,7 @@ This project adheres to [Semantic Versioning](https://semver.org), where the API
 
 - Initial release.
 
+[0.0.5]: https://github.com/sunshowers/cargo-search2/releases/tag/0.0.5
 [0.0.4]: https://github.com/sunshowers/cargo-search2/releases/tag/0.0.4
 [0.0.3]: https://github.com/sunshowers/cargo-search2/releases/tag/0.0.3
 [0.0.2]: https://github.com/sunshowers/cargo-search2/releases/tag/0.0.2

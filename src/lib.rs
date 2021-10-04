@@ -147,9 +147,9 @@ impl Args {
                 println!("{}", json);
             }
             MessageFormat::github => {
-                println!("::set-output crate-name {}", output.crate_name);
-                println!("::set-output version {}", output.version);
-                println!("::set-output hash {}", output.hash);
+                println!("::set-output name=crate-name::{}", output.crate_name);
+                println!("::set-output name=version::{}", output.version);
+                println!("::set-output name=hash::{}", output.hash);
             }
         }
 

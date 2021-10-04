@@ -31,9 +31,9 @@ $ cargo search2 serde --req '=1.0.120'
 
 # Print out GitHub Actions commands
 $ cargo search2 serde --message-format github
-::set-output crate-name serde
-::set-output version 1.0.130
-::set-output hash blake2b24:48d4caa68090087560e9c4b174bfa95435078e4949195eb1
+::set-output name=crate-name::serde
+::set-output name=version::1.0.130
+::set-output name=hash::blake2b24:48d4caa68090087560e9c4b174bfa95435078e4949195eb1
 ```
 
 ## Why?
