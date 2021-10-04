@@ -1,8 +1,17 @@
 [package]
 name = "cargo-search2"
+description = "cargo search, optimized for CI caching in GitHub Actions and elsewhere"
 version = "0.1.0"
 edition = "2018"
 license = "MIT OR Apache-2.0"
+repository = "https://github.com/sunshowers/cargo-search2"
+keywords = [
+    "cargo",
+    "crates-io",
+]
+categories = [
+    "development-tools::cargo-plugins",
+]
 
 [dependencies]
 cfg-if = "1.0.0"
