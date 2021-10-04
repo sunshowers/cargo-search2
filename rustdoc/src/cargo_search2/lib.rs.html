@@ -158,9 +158,21 @@
 <span id="158">158</span>
 <span id="159">159</span>
 <span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright (c) The cargo-search2 Contributors</span>
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
+
+<span class="doccomment">//! A version of `cargo search`, suitable for CI caching in GitHub Actions and elsewhere.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Provides output in JSON and GitHub Actions formats.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! For more, see the [crates.io page](https://crates.io/cargo-search2).</span>
 
 <span class="kw">use</span> <span class="ident">blake2b_simd::Params</span>;
 <span class="kw">use</span> <span class="ident">color_eyre</span>::{
