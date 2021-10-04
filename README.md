@@ -6,7 +6,9 @@ A binary utility that provides a more convenient version of `cargo search`.
 
 ## Installation
 
-Grab pre-built binaries for your platform:
+Grab pre-built binaries for your platform from [the releases page](https://github.com/sunshowers/cargo-search2/releases/latest).
+
+To grab releases in CI or other automation:
 
 ```sh
 curl -LsSf https://github.com/sunshowers/cargo-search2/releases/latest/download/cargo-search2-{platform}.zip | tar xzf - -C ~/.cargo/bin
@@ -23,25 +25,41 @@ cargo install cargo-search2
 ```sh
 $ cargo search2 serde
 # output:
+serde 1.0.130 (hash: blake2b24:48d4caa68090087560e9c4b174bfa95435078e4949195eb1)
+
+$ cargo search2 serde --message-format toml
+serde = "1.0.130"
+
+$ cargo search2 serde --message-format json
 {"crate-name":"serde","version":"1.0.130","hash":"blake2b24:48d4caa68090087560e9c4b174bfa95435078e4949195eb1"}
 
 # Get an exact version (also accepts arbitrary versions)
 $ cargo search2 serde --req '=1.0.120'
-{"crate-name":"serde","version":"1.0.120","hash":"blake2b24:41a5040c3830edc7e758bf828a93fa6a305509cf7bc9017a"}
+serde 1.0.120 (hash: blake2b24:41a5040c3830edc7e758bf828a93fa6a305509cf7bc9017a)
 
-# Print out GitHub Actions commands
+# Step outputs for GitHub Actions
 $ cargo search2 serde --message-format github
 ::set-output name=crate-name::serde
 ::set-output name=version::1.0.130
 ::set-output name=hash::blake2b24:48d4caa68090087560e9c4b174bfa95435078e4949195eb1
 ```
 
+`cargo-guppy` has an example of [using `cargo search2` in GitHub Actions to perform caching](https://github.com/facebookincubator/cargo-guppy/blob/main/.github/workflows/hakari.yml).
+
 ## Why?
 
-People often use `cargo search` to generate cache keys for tools. This is an easier way to achieve the same goal.
+People often use `cargo search` to generate cache keys for tools. This is an easier way to achieve the same goal with a
+couple more features.
 
 In particular, it supports:
 * looking for version specifiers
 * producing results in both JSON and GitHub Actions formats
 
-## Usage
+## Contributing
+
+Pull requests are welcome! Please follow the [code of conduct](CODE_OF_CONDUCT.md).
+
+## License
+
+This project is available under the terms of either the [Apache 2.0 license](LICENSE-APACHE) or the [MIT
+license](LICENSE-MIT).

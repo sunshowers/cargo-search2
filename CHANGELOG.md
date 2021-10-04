@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 This project adheres to [Semantic Versioning](https://semver.org), where the API is the command-line interface.
 
+## [0.1.0] - 2021-10-03
+
+- First (real) release.
+- Add `plain` and `toml` message formats, and switch the default to `plain`.
+
 ## [0.0.5] - 2021-10-03
 
 - Fix GitHub messasge format.
@@ -26,6 +31,7 @@ This project adheres to [Semantic Versioning](https://semver.org), where the API
 
 - Initial release.
 
+[0.1.0]: https://github.com/sunshowers/cargo-search2/releases/tag/0.1.0
 [0.0.5]: https://github.com/sunshowers/cargo-search2/releases/tag/0.0.5
 [0.0.4]: https://github.com/sunshowers/cargo-search2/releases/tag/0.0.4
 [0.0.3]: https://github.com/sunshowers/cargo-search2/releases/tag/0.0.3

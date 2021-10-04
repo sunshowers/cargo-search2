@@ -40,7 +40,7 @@ pub struct Args {
     #[structopt(long = "req", default_value)]
     version_req: VersionReq,
 
-    #[structopt(long, possible_values = &MessageFormat::variants(), case_insensitive = true, default_value = "json")]
+    #[structopt(long, possible_values = &MessageFormat::variants(), case_insensitive = true, default_value = "plain")]
     message_format: MessageFormat,
 }
 
@@ -52,6 +52,8 @@ arg_enum! {
     #[derive(Copy, Clone, Debug)]
     #[allow(non_camel_case_types)]
     enum MessageFormat {
+        toml,
+        plain,
         json,
         github,
     }
@@ -140,6 +142,15 @@ impl Args {
         };
 
         match self.message_format {
+            MessageFormat::plain => {
+                println!(
+                    "{} {} (hash: {})",
+                    output.crate_name, output.version, output.hash
+                );
+            }
+            MessageFormat::toml => {
+                println!(r#"{} = "{}""#, output.crate_name, output.version);
+            }
             MessageFormat::json => {
                 let json = serde_json::to_string(&output).wrap_err_with(|| {
                     format!("couldn't serialize serde output for {:?}", output)
