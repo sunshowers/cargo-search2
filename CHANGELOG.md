@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 This project adheres to [Semantic Versioning](https://semver.org), where the API is the command-line interface.
 
+## [0.1.1] - 2021-10-03
+
+- Republished 0.1.0 (it had accidentally been published earlier).
+
 ## [0.1.0] - 2021-10-03
 
 - First (real) release.
@@ -31,6 +35,7 @@ This project adheres to [Semantic Versioning](https://semver.org), where the API
 
 - Initial release.
 
+[0.1.1]: https://github.com/sunshowers/cargo-search2/releases/tag/0.1.1
 [0.1.0]: https://github.com/sunshowers/cargo-search2/releases/tag/0.1.0
 [0.0.5]: https://github.com/sunshowers/cargo-search2/releases/tag/0.0.5
 [0.0.4]: https://github.com/sunshowers/cargo-search2/releases/tag/0.0.4
