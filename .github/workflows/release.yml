@@ -1,4 +1,4 @@
-# adapted from cargo-hack's release flow
+# adapted from https://github.com/taiki-e/cargo-hack/blob/main/.github/workflows/release.yml
 
 name: Release binaries
 on:
@@ -6,7 +6,32 @@ on:
     tags:
       - '*'
 
+
 jobs:
+  create-release:
+    if: github.repository_owner == 'taiki-e'
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+      - run: cargo package
+      - uses: taiki-e/create-gh-release-action@v1
+        with:
+          changelog: CHANGELOG.md
+          title: $version
+          branch: main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: cargo publish
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+
   upload-assets:
     name: Publish for ${{ matrix.target }}
     needs:
@@ -15,13 +40,13 @@ jobs:
       matrix:
         include:
           - target: x86_64-unknown-linux-gnu
-            os: ubuntu-latest
+            os: ubuntu-18.04
           - target: x86_64-apple-darwin
             os: macos-latest
           - target: x86_64-pc-windows-msvc
             os: windows-latest
           - target: x86_64-unknown-linux-musl
-            os: ubuntu-latest
+            os: ubuntu-18.04
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
