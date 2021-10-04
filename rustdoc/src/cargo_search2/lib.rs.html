@@ -314,9 +314,9 @@
                 <span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">json</span>);
             }
             <span class="ident">MessageFormat::github</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">println!</span>(<span class="string">&quot;::set-output crate-name {}&quot;</span>, <span class="ident">output</span>.<span class="ident">crate_name</span>);
-                <span class="macro">println!</span>(<span class="string">&quot;::set-output version {}&quot;</span>, <span class="ident">output</span>.<span class="ident">version</span>);
-                <span class="macro">println!</span>(<span class="string">&quot;::set-output hash {}&quot;</span>, <span class="ident">output</span>.<span class="ident">hash</span>);
+                <span class="macro">println!</span>(<span class="string">&quot;::set-output name=crate-name::{}&quot;</span>, <span class="ident">output</span>.<span class="ident">crate_name</span>);
+                <span class="macro">println!</span>(<span class="string">&quot;::set-output name=version::{}&quot;</span>, <span class="ident">output</span>.<span class="ident">version</span>);
+                <span class="macro">println!</span>(<span class="string">&quot;::set-output name=hash::{}&quot;</span>, <span class="ident">output</span>.<span class="ident">hash</span>);
             }
         }
 
