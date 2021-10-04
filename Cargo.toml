@@ -5,6 +5,7 @@ version = "0.1.0"
 edition = "2018"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/sunshowers/cargo-search2"
+readme = "README.md"
 keywords = [
     "cargo",
     "crates-io",

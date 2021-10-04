@@ -1,4 +1,4 @@
-# adapted from cargo-make's release flow
+# adapted from cargo-hack's release flow
 
 name: Release binaries
 on:
@@ -7,52 +7,36 @@ on:
       - '*'
 
 jobs:
-  build:
-    name: Publish for ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
+  upload-assets:
+    name: Publish for ${{ matrix.target }}
+    needs:
+      - create-release
     strategy:
-      fail-fast: false
       matrix:
         include:
-          - os: ubuntu-latest
-            binary_target: x86_64-unknown-linux-musl
-          - os: windows-latest
-            binary_target: x86_64-pc-windows-msvc
-          - os: macos-latest
-            binary_target: x86_64-apple-darwin
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+          - target: x86_64-apple-darwin
+            os: macos-latest
+          - target: x86_64-pc-windows-msvc
+            os: windows-latest
+          - target: x86_64-unknown-linux-musl
+            os: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     steps:
-    - name: Install musl tools
-      if: matrix.os == 'ubuntu-latest'
-      run: sudo apt-get install musl-tools
-    - name: Checkout
-      uses: actions/checkout@v2
-    - name: Install Rust
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
-        profile: minimal
-        override: true
-    - name: Install Rust MSVC Windows target
-      if: matrix.os == 'windows-latest'
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable-x86_64-pc-windows-msvc
-        profile: minimal
-        override: true
-    - name: rust-cargo-make
-      uses: davidB/rust-cargo-make@v1.6.0
-
-    - name: Build cargo-search2
-      uses: actions-rs/cargo@v1
-      with:
-        command: run
-        args: --bin cargo-make --target-dir target_ci -- make zip-release-ci-flow --env CARGO_MAKE_RELEASE_FLOW_TARGET=${{ matrix.binary_target }}
-
-    - name: Upload binaries
-      uses: svenstaro/upload-release-action@v1-release
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: '*.zip'
-        tag: ${{ github.ref }}
-        overwrite: true
-        file_glob: true
+      - uses: actions/checkout@v2
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+      - uses: taiki-e/upload-rust-binary-action@v1
+        with:
+          bin: cargo-search2
+          target: ${{ matrix.target }}
+          tar: all
+          zip: windows
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CARGO_PROFILE_RELEASE_LTO: true

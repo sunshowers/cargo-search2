@@ -1,6 +1,12 @@
 // Copyright (c) The cargo-search2 Contributors
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
+//! A version of `cargo search`, suitable for CI caching in GitHub Actions and elsewhere.
+//!
+//! Provides output in JSON and GitHub Actions formats.
+//!
+//! For more, see the [crates.io page](https://crates.io/cargo-search2).
+
 use blake2b_simd::Params;
 use color_eyre::{
     eyre::{bail, eyre, WrapErr},
