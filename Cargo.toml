@@ -1,7 +1,7 @@
 [package]
 name = "cargo-search2"
 description = "cargo search, optimized for CI caching in GitHub Actions and elsewhere"
-version = "0.1.0"
+version = "0.0.3"
 edition = "2018"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/sunshowers/cargo-search2"
