@@ -20,28 +20,33 @@ use structopt::{clap::arg_enum, StructOpt};
 
 /// Search packages on crates.io by version.
 ///
-/// This is a version of `cargo search` that:
-/// * uses exact names rather than searching on prefixes
-/// * matches by semver
-/// * outputs data as JSON or as github set-output actions
-/// * outputs a hash along with the version matched.
+/// This is a version of `cargo search` that uses exact names rather than searching on prefixes. It
+/// supports matching by semver ranges, hashing version numbers, and a number of output formats
+/// including JSON and GitHub Actions.
 ///
-/// This is optimized for cache keys and lookups on GitHub Actions.
+/// `cargo search2` is optimized for cache keys and lookups on GitHub Actions and other CI
+/// platforms.
 #[derive(Debug, StructOpt)]
+#[doc(hidden)]
 pub struct Args {
-    /// The name of the package to look for.
-    name: String,
-
     /// The index to use (default: same as Cargo's).
     #[structopt(long)]
     index_path: Option<PathBuf>,
 
-    /// The version specification to match (highest by default).
+    /// Version specification to match
     #[structopt(long = "req", default_value)]
     version_req: VersionReq,
 
+    /// Bump this up to invalidate cache keys
+    #[structopt(long, short = "c", default_value)]
+    cache_version: u64,
+
+    /// Output format
     #[structopt(long, possible_values = &MessageFormat::variants(), case_insensitive = true, default_value = "plain")]
     message_format: MessageFormat,
+
+    /// The name of the package to look for.
+    crate_name: String,
 }
 
 const BLAKE2B_PREFIX: &str = "blake2b24:";
@@ -72,8 +77,8 @@ impl Args {
             .wrap_err_with(|| format!("updating index at {} failed", index.path().display()))?;
 
         let crate_ = index
-            .crate_(&self.name)
-            .ok_or_else(|| eyre!("crate {} not found", &self.name))?;
+            .crate_(&self.crate_name)
+            .ok_or_else(|| eyre!("crate {} not found", &self.crate_name))?;
         let mut matching_versions: Vec<Version> = crate_
             .versions()
             .iter()
@@ -101,8 +106,10 @@ impl Args {
                 let mut state = params.hash_length(BLAKE2B_HASH_LEN).to_state();
 
                 state.update(crate_.name().as_bytes());
-                state.update(b":");
+                state.update(b"\0");
                 state.update(found_version.to_string().as_bytes());
+                state.update(b"\0");
+                state.update(&self.cache_version.to_be_bytes());
                 let blake2b_hash = state.finalize();
                 let blake2b_hex = blake2b_hash.to_hex();
 

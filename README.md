@@ -25,35 +25,55 @@ cargo install cargo-search2
 ```sh
 $ cargo search2 serde
 # output:
-serde 1.0.130 (hash: blake2b24:48d4caa68090087560e9c4b174bfa95435078e4949195eb1)
+serde 1.0.130 (hash: blake2b24:2e6117acae4f6f2d2d698c9fc0b43de60ac26556f44ad96b)
 
 $ cargo search2 serde --message-format toml
 serde = "1.0.130"
 
 $ cargo search2 serde --message-format json
-{"crate-name":"serde","version":"1.0.130","hash":"blake2b24:48d4caa68090087560e9c4b174bfa95435078e4949195eb1"}
+{"crate-name":"serde","version":"1.0.130","hash":"blake2b24:2e6117acae4f6f2d2d698c9fc0b43de60ac26556f44ad96b"}
 
-# Get an exact version (also accepts arbitrary versions)
+# Get an exact version or semver range
 $ cargo search2 serde --req '=1.0.120'
-serde 1.0.120 (hash: blake2b24:41a5040c3830edc7e758bf828a93fa6a305509cf7bc9017a)
+serde 1.0.120 (hash: blake2b24:f79131f50c298569f841e47287c3b0a443c29cfda3ffd475)
+
+# Use --cache-version/-c to invalidate caches
+$ cargo run -- serde --req '=1.0.120' -c1
+serde 1.0.120 (hash: blake2b24:168778241e3b0e96f5547fba1eb4b4b84efa8291c3c14b37)
+$ cargo run -- serde --req '=1.0.120' -c2
+serde 1.0.120 (hash: blake2b24:344d8a8d08a16dbce8c4e0d90fd6aad513631ca081185ea8)
 
 # Step outputs for GitHub Actions
 $ cargo search2 serde --message-format github
 ::set-output name=crate-name::serde
-::set-output name=version::1.0.130
-::set-output name=hash::blake2b24:48d4caa68090087560e9c4b174bfa95435078e4949195eb1
+::set-output name=version::1.0.120
+::set-output name=hash::blake2b24:f79131f50c298569f841e47287c3b0a443c29cfda3ffd475
 ```
 
-`cargo-guppy` has an example of [using `cargo search2` in GitHub Actions to perform caching](https://github.com/facebookincubator/cargo-guppy/blob/main/.github/workflows/hakari.yml).
+For an example GitHub Action, see [`.github/workflows/example.yml](.github/workflows/example.yml).
 
 ## Why?
 
-People often use `cargo search` to generate cache keys for tools. This is an easier way to achieve the same goal with a
+People sometimes use `cargo search` to generate cache keys for tools. This is an easier way to achieve the same goal with a
 couple more features.
 
-In particular, it supports:
-* looking for version specifiers
-* producing results in both JSON and GitHub Actions formats
+`cargo search2` supports:
+* looking for exact versions and semver ranges
+* producing results in plain, JSON, and GitHub Actions formats
+* easy cache invalidation through the `--cache-version` option
+
+## Hash contents
+
+The hashes produced by `cargo search2` are derived from:
+* The name of the crate
+* The exact version number
+* The cache version
+
+Notably, the operating system and other parts of the environment are *not* part of the hash.
+
+## Stability guarantees
+
+Within a semver range, the command-line interface is append-only, and hashes stay the same.
 
 ## Contributing
 
