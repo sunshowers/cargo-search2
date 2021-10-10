@@ -1,0 +1,69 @@
+# This workflow file is an example for how to use `cargo search2` to cache binaries in GitHub Actions.
+# For this example we're going to install the `cargo bloat` binary: https://crates.io/crates/cargo-bloat
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+name: Example cargo search2 workflow
+
+jobs:
+  cache-and-run:
+    runs-on: ubuntu-latest
+    env:
+      RUSTFLAGS: -D warnings
+    steps:
+      - uses: actions/checkout@v2
+
+      # Install a copy of the Rust toolchain.
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+
+      # Install cargo search2.
+      - name: Install cargo-search2
+        id: install-cargo-search2
+        run: |
+          curl -LsSf https://github.com/sunshowers/cargo-search2/releases/latest/download/cargo-search2-x86_64-unknown-linux-gnu.tar.gz | tar xzf - -C ~/.cargo/bin
+        shell: bash
+
+      # Get the version of your binary crate (cargo-bloat in this example).
+      - name: Get cargo-bloat version
+        id: cargo-bloat-version
+        # In this example we grab the latest version. Use --req to specify a semver range.
+        run: |
+          cargo search2 cargo-bloat --message-format github
+        shell: bash
+
+      # Load up the cache, or instruct GitHub Actions to add the binary to the cache if not available.
+      - name: Attempt to load cached cargo-bloat
+        uses: actions/cache@v2
+        id: cargo-bloat-cache
+        with:
+          # If the crate installs multiple binaries, you can list them all out here.
+          path: |
+            ~/.cargo/bin/cargo-bloat
+            ~/.cargo/bin/cargo-bloat.exe
+
+          # Note that the hash does *not* include the OS or other parts of the environment. In this case we'd like
+          # to have per-OS caching, so add the OS to the cache key.
+          key: ${{ runner.os }}-${{ steps.cargo-bloat-version.outputs.hash }}
+
+      # Install the binary if there was a cache miss.
+      - name: Install cargo-bloat
+        if: steps.cargo-bloat-cache.outputs.cache-hit != 'true'
+        uses: actions-rs/install@v0.1.2
+        with:
+          crate: cargo-bloat
+          version: ${{ steps.cargo-bloat-version.outputs.version }}
+
+      # At this point, the binary is available for further use. If there was a cache miss, the built binary will
+      # automatically be cached at the end of the job, but only if it is running in a privileged context (e.g. not from
+      # a fork). This is to prevent malicious actors from opening a pull request and poisoning the cache.
+      #
+      # If you poison the cache by accident, add a -c/--cache-version option to the cargo search2 command. For example,
+      # -c1, -c2 and so on.
