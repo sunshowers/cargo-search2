@@ -50,7 +50,7 @@ $ cargo search2 serde --message-format github
 ::set-output name=hash::blake2b24:f79131f50c298569f841e47287c3b0a443c29cfda3ffd475
 ```
 
-For an example GitHub Action, see [`.github/workflows/example.yml](.github/workflows/example.yml).
+For an example GitHub Action, see [`.github/workflows/example.yml`](.github/workflows/example.yml).
 
 ## Why?
 

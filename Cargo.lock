@@ -89,7 +89,7 @@ dependencies = [
 
 [[package]]
 name = "cargo-search2"
-version = "0.1.1"
+version = "0.2.1"
 dependencies = [
  "blake2b_simd",
  "cfg-if",
