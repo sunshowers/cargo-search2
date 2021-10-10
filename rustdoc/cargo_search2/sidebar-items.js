@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Args","Search packages on crates.io by version."]]});
+initSidebarItems({});

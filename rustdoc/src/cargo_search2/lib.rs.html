@@ -175,6 +175,13 @@
 <span id="175">175</span>
 <span id="176">176</span>
 <span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright (c) The cargo-search2 Contributors</span>
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
@@ -198,28 +205,33 @@
 
 <span class="doccomment">/// Search packages on crates.io by version.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// This is a version of `cargo search` that:</span>
-<span class="doccomment">/// * uses exact names rather than searching on prefixes</span>
-<span class="doccomment">/// * matches by semver</span>
-<span class="doccomment">/// * outputs data as JSON or as github set-output actions</span>
-<span class="doccomment">/// * outputs a hash along with the version matched.</span>
+<span class="doccomment">/// This is a version of `cargo search` that uses exact names rather than searching on prefixes. It</span>
+<span class="doccomment">/// supports matching by semver ranges, hashing version numbers, and a number of output formats</span>
+<span class="doccomment">/// including JSON and GitHub Actions.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// This is optimized for cache keys and lookups on GitHub Actions.</span>
+<span class="doccomment">/// `cargo search2` is optimized for cache keys and lookups on GitHub Actions and other CI</span>
+<span class="doccomment">/// platforms.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">StructOpt</span>)]</span>
+<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Args</span> {
-    <span class="doccomment">/// The name of the package to look for.</span>
-    <span class="ident">name</span>: <span class="ident">String</span>,
-
     <span class="doccomment">/// The index to use (default: same as Cargo&#39;s).</span>
     <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>)]</span>
     <span class="ident">index_path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span>,
 
-    <span class="doccomment">/// The version specification to match (highest by default).</span>
+    <span class="doccomment">/// Version specification to match</span>
     <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span> <span class="op">=</span> <span class="string">&quot;req&quot;</span>, <span class="ident">default_value</span>)]</span>
     <span class="ident">version_req</span>: <span class="ident">VersionReq</span>,
 
+    <span class="doccomment">/// Bump this up to invalidate cache keys</span>
+    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>, <span class="ident">short</span> <span class="op">=</span> <span class="string">&quot;c&quot;</span>, <span class="ident">default_value</span>)]</span>
+    <span class="ident">cache_version</span>: <span class="ident">u64</span>,
+
+    <span class="doccomment">/// Output format</span>
     <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>, <span class="ident">possible_values</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">MessageFormat::variants</span>(), <span class="ident">case_insensitive</span> <span class="op">=</span> <span class="bool-val">true</span>, <span class="ident">default_value</span> <span class="op">=</span> <span class="string">&quot;plain&quot;</span>)]</span>
     <span class="ident">message_format</span>: <span class="ident">MessageFormat</span>,
+
+    <span class="doccomment">/// The name of the package to look for.</span>
+    <span class="ident">crate_name</span>: <span class="ident">String</span>,
 }
 
 <span class="kw">const</span> <span class="ident">BLAKE2B_PREFIX</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;blake2b24:&quot;</span>;
@@ -250,8 +262,8 @@
             .<span class="ident">wrap_err_with</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;updating index at {} failed&quot;</span>, <span class="ident">index</span>.<span class="ident">path</span>().<span class="ident">display</span>()))<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">crate_</span> <span class="op">=</span> <span class="ident">index</span>
-            .<span class="ident">crate_</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>)
-            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">eyre!</span>(<span class="string">&quot;crate {} not found&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>))<span class="question-mark">?</span>;
+            .<span class="ident">crate_</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">crate_name</span>)
+            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">eyre!</span>(<span class="string">&quot;crate {} not found&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">crate_name</span>))<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">matching_versions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Version</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">crate_</span>
             .<span class="ident">versions</span>()
             .<span class="ident">iter</span>()
@@ -279,8 +291,10 @@
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">params</span>.<span class="ident">hash_length</span>(<span class="ident">BLAKE2B_HASH_LEN</span>).<span class="ident">to_state</span>();
 
                 <span class="ident">state</span>.<span class="ident">update</span>(<span class="ident">crate_</span>.<span class="ident">name</span>().<span class="ident">as_bytes</span>());
-                <span class="ident">state</span>.<span class="ident">update</span>(<span class="string">b&quot;:&quot;</span>);
+                <span class="ident">state</span>.<span class="ident">update</span>(<span class="string">b&quot;\0&quot;</span>);
                 <span class="ident">state</span>.<span class="ident">update</span>(<span class="ident">found_version</span>.<span class="ident">to_string</span>().<span class="ident">as_bytes</span>());
+                <span class="ident">state</span>.<span class="ident">update</span>(<span class="string">b&quot;\0&quot;</span>);
+                <span class="ident">state</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cache_version</span>.<span class="ident">to_be_bytes</span>());
                 <span class="kw">let</span> <span class="ident">blake2b_hash</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">finalize</span>();
                 <span class="kw">let</span> <span class="ident">blake2b_hex</span> <span class="op">=</span> <span class="ident">blake2b_hash</span>.<span class="ident">to_hex</span>();
 
