@@ -12,11 +12,13 @@ use color_eyre::{
     eyre::{bail, eyre, WrapErr},
     Result,
 };
-use crates_index::Index;
+use crates_index::BareIndex;
 use semver::{Version, VersionReq};
 use serde::Serialize;
 use std::path::PathBuf;
 use structopt::{clap::arg_enum, StructOpt};
+
+static DEFAULT_INDEX_URL: &str = "https://github.com/rust-lang/crates.io-index";
 
 /// Search packages on crates.io by version.
 ///
@@ -68,15 +70,21 @@ impl Args {
     /// Execute this and return
     pub fn exec(self) -> Result<()> {
         let index = match &self.index_path {
-            Some(path) => Index::new(path),
-            None => Index::new_cargo_default(),
+            Some(path) => BareIndex::with_path(path.clone(), DEFAULT_INDEX_URL),
+            None => BareIndex::new_cargo_default(),
         };
 
-        index
-            .retrieve_or_update()
+        let mut repo = index.open_or_clone().wrap_err_with(|| {
+            format!(
+                "opening or cloning index at {} failed",
+                index.path().display()
+            )
+        })?;
+
+        repo.retrieve()
             .wrap_err_with(|| format!("updating index at {} failed", index.path().display()))?;
 
-        let crate_ = index
+        let crate_ = repo
             .crate_(&self.crate_name)
             .ok_or_else(|| eyre!("crate {} not found", &self.crate_name))?;
         let mut matching_versions: Vec<Version> = crate_
